@@ -4,13 +4,15 @@
 ## Minimal program at CuteS
 
 ```CuteS
+using System;
+
 namespace Sample
 {
-	scripts Example
+	fnclass Example
 	{
-		script Main() 
+		function void Main() 
 		{
-			
+			Console.WriteLine("Hello World");
 		} 
 	}
 }
