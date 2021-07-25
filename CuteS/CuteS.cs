@@ -2,7 +2,7 @@
 
 namespace CuteS
 {
-    class Program
+    class CuteS
     {
         static void Main(string[] args)
         {
