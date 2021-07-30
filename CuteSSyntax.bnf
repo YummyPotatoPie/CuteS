@@ -1,0 +1,20 @@
+<program>		::= <imports> <namespace>
+
+<imports>		::= <import> <imports> | ""
+<import>		::= "import" <namespace-id> ";" | ""
+<namespace-id>	::= <id> | <id> "." <namespace-id>
+
+<namespace>		::= "namespace" <id> "{" <classes> "}"
+<classes>		::= <class> <classes> | ""
+<class>			::= "class" <id> "{" <class-body> "}"
+<class-body>	::= <declaration> <class-body> | <function> <class-body> | ""
+
+<declaration>	::= "let" <id> ":" <type> <assigment> ";"
+<function>		::= "fn" <type> <id> "(" <params> ")" "{" <function-body> "}"
+
+<assigment>		::= "=" <expression> | ""
+<params>		::= <param> <params> | <param> "," <params> | ""
+<param>			::= <id> ":" <type>
+
+<function-body>	::= <statements>
+<statements>	::= <statement> <statements> | ""

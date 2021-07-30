@@ -1,12 +1,10 @@
-﻿using System;
-
-namespace CuteS
+﻿namespace CuteS
 {
-    class CuteS
+    public class CuteS
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            CompilerSettings argsParser = new ArgumentsParser(string.Join("", args)).Parse();
         }
     }
 }
