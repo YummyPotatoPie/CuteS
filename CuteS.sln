@@ -6,10 +6,13 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9D5F193A-24C1-47A9-AFE5-F6EF3C8549ED}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		CuteSSyntax.bnf = CuteSSyntax.bnf
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CuteS", "CuteS\CuteS.csproj", "{C71BBB12-CD46-457E-A5AC-831C3CFBAF7C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CuteS", "CuteS\CuteS.csproj", "{C71BBB12-CD46-457E-A5AC-831C3CFBAF7C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CuteS.Tests", "CuteS.Tests\CuteS.Tests.csproj", "{D11E24B4-3B13-43A6-98AA-B406DFF7A176}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +24,10 @@ Global
 		{C71BBB12-CD46-457E-A5AC-831C3CFBAF7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C71BBB12-CD46-457E-A5AC-831C3CFBAF7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C71BBB12-CD46-457E-A5AC-831C3CFBAF7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D11E24B4-3B13-43A6-98AA-B406DFF7A176}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D11E24B4-3B13-43A6-98AA-B406DFF7A176}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D11E24B4-3B13-43A6-98AA-B406DFF7A176}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D11E24B4-3B13-43A6-98AA-B406DFF7A176}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
