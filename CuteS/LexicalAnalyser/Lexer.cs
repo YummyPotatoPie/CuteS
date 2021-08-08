@@ -13,6 +13,8 @@ namespace CuteS.LexicalAnalyser
 
         private int _position = 0;
 
+        public Hashtable _reservedWordsTable { get; private set; } = new();
+
         private List<char> currentLineBuffer = new();
 
         public int Line { get; private set; } = 1;
@@ -27,9 +29,47 @@ namespace CuteS.LexicalAnalyser
             ReserveWord(WordToken.Namespace);
             ReserveWord(WordToken.Class);
             ReserveWord(WordToken.Import);
+
+            // Reserve special words
+            // Nothing here for now
+
+            // Reserve operators
+            ReserveWord(WordToken.Add);
+            ReserveWord(WordToken.AddAssign);
+            ReserveWord(WordToken.Assign);
+            ReserveWord(WordToken.BitAnd);
+            ReserveWord(WordToken.BitAndAssign);
+            ReserveWord(WordToken.BitNot);
+            ReserveWord(WordToken.BitNotAssign);
+            ReserveWord(WordToken.BitOr);
+            ReserveWord(WordToken.BitOrAssign);
+            ReserveWord(WordToken.BoolAnd);
+            ReserveWord(WordToken.BoolNot);
+            ReserveWord(WordToken.BoolOr);
+            ReserveWord(WordToken.Div);
+            ReserveWord(WordToken.DivAssign);
+            ReserveWord(WordToken.DotOp);
+            ReserveWord(WordToken.Eq);
+            ReserveWord(WordToken.Greater);
+            ReserveWord(WordToken.GreaterEq);
+            ReserveWord(WordToken.Lower);
+            ReserveWord(WordToken.LowerEq);
+            ReserveWord(WordToken.LShift);
+            ReserveWord(WordToken.LShiftAssign);
+            ReserveWord(WordToken.Mod);
+            ReserveWord(WordToken.ModAssign);
+            ReserveWord(WordToken.Mul);
+            ReserveWord(WordToken.NotEq);
+            ReserveWord(WordToken.RShift);
+            ReserveWord(WordToken.RShiftAssign);
+            ReserveWord(WordToken.Sub);
+            ReserveWord(WordToken.SubAssign);
+            ReserveWord(WordToken.TypeOp);
+            ReserveWord(WordToken.Xor);
+            ReserveWord(WordToken.XorAssign);
         }
 
-        private void ReserveWord(WordToken word) => IdentifiersTable.Add(word.Lexeme, word);
+        private void ReserveWord(WordToken word) => _reservedWordsTable.Add(word.Lexeme, word);
 
         private void SkipWhiteSpaces()
         {
@@ -53,12 +93,22 @@ namespace CuteS.LexicalAnalyser
             }
         }
 
-        private bool IsOperatorSymbol(char symbol) => "~!%^&*-+=|/<>:".IndexOf(symbol) > -1;
+        private static bool IsOperatorSymbol(char symbol) => "~!%^&*-+=|/<>:.".IndexOf(symbol) > -1;
 
+        // This method is a collection of garbage and shit code (for my opinion), but idk how to write it another way
         private Token NextOperator()
         {
-            // TODO: Implementation 
-            throw new NotImplementedException();
+            StringBuilder buffer = new();
+
+            while (_position != _stream.Length && IsOperatorSymbol(_stream[_position]))
+            {
+                buffer.Append(_stream[_position]);
+                _position++;
+            }
+
+            WordToken op = (WordToken) IdentifiersTable[buffer.ToString()];
+            if (op == null) throw new LexerError(currentLineBuffer, "Invalid operator", Line);
+            return op;
         }
 
         private WordToken NextWord()
@@ -74,7 +124,7 @@ namespace CuteS.LexicalAnalyser
                     _position++;
                 }
 
-                WordToken token = (WordToken) IdentifiersTable[buffer.ToString()];
+                WordToken token = (WordToken) _reservedWordsTable[buffer.ToString()];
                 if (token != null) return token;
 
                 token = new(buffer.ToString());
@@ -90,12 +140,17 @@ namespace CuteS.LexicalAnalyser
         private Token NextNumber()
         {
             int value = 0;
-            while (_position != _stream.Length && char.IsDigit(_stream[_position]))
-            {
-                currentLineBuffer.Add(_stream[_position]);
-                value = value * 10 + _stream[_position] - '0';
-                _position++;
+            if (_stream[_position] - '0' == 0) _position++;
+            else {
+                while (_position != _stream.Length && char.IsDigit(_stream[_position]))
+                {
+                    currentLineBuffer.Add(_stream[_position]);
+                    value = value * 10 + _stream[_position] - '0';
+                    _position++;
+                }
             }
+
+            if (_position != _stream.Length && value == 0 && char.IsDigit(_stream[_position])) throw new LexerError(currentLineBuffer, "Invalid number entry", Line);
 
             if (_position != _stream.Length && _stream[_position] == '.')
             {
