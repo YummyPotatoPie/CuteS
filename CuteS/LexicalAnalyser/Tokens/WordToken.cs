@@ -8,7 +8,21 @@
         public readonly static WordToken
             Namespace   = new("namespace", TokenAttributes.Namespace),
             Class       = new("class", TokenAttributes.Class),
-            Import      = new("import", TokenAttributes.Import);
+            Import      = new("import", TokenAttributes.Import),
+            Function    = new("fn", TokenAttributes.Function),
+            Let         = new("let", TokenAttributes.Let),
+            For         = new("for", TokenAttributes.For),
+            While       = new("while", TokenAttributes.While),
+            If          = new("if", TokenAttributes.If),
+            Else        = new("else", TokenAttributes.Else),
+            Return      = new("return", TokenAttributes.Return);
+
+        // Primitive types
+        public readonly static WordToken
+            Int         = new("Int", TokenAttributes.Int),
+            Float       = new("Float", TokenAttributes.Float),
+            Bool        = new("Bool", TokenAttributes.Bool),
+            String      = new("String", TokenAttributes.String);
 
         // Operators
         public readonly static WordToken
