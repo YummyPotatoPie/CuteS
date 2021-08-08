@@ -9,7 +9,7 @@ namespace CuteS.LexicalAnalyser
 {
     public class Lexer
     {
-        private readonly string _stream;
+        private string _stream;
 
         private int _position = 0;
 
@@ -29,9 +29,19 @@ namespace CuteS.LexicalAnalyser
             ReserveWord(WordToken.Namespace);
             ReserveWord(WordToken.Class);
             ReserveWord(WordToken.Import);
+            ReserveWord(WordToken.Function);
+            ReserveWord(WordToken.Let);
+            ReserveWord(WordToken.For);
+            ReserveWord(WordToken.While);
+            ReserveWord(WordToken.If);
+            ReserveWord(WordToken.Else);
+            ReserveWord(WordToken.Return);
 
             // Reserve special words
-            // Nothing here for now
+            ReserveWord(WordToken.Int);
+            ReserveWord(WordToken.Float);
+            ReserveWord(WordToken.String);
+            ReserveWord(WordToken.Bool);
 
             // Reserve operators
             ReserveWord(WordToken.Add);
@@ -69,6 +79,12 @@ namespace CuteS.LexicalAnalyser
             ReserveWord(WordToken.XorAssign);
         }
 
+        public void SetNewStream(string stream)
+        {
+            _stream = stream;
+            _position = 0;
+        } 
+
         private void ReserveWord(WordToken word) => _reservedWordsTable.Add(word.Lexeme, word);
 
         private void SkipWhiteSpaces()
@@ -95,18 +111,18 @@ namespace CuteS.LexicalAnalyser
 
         private static bool IsOperatorSymbol(char symbol) => "~!%^&*-+=|/<>:.".IndexOf(symbol) > -1;
 
-        // This method is a collection of garbage and shit code (for my opinion), but idk how to write it another way
         private Token NextOperator()
         {
             StringBuilder buffer = new();
 
             while (_position != _stream.Length && IsOperatorSymbol(_stream[_position]))
             {
+                currentLineBuffer.Add(_stream[_position]);
                 buffer.Append(_stream[_position]);
                 _position++;
             }
 
-            WordToken op = (WordToken) IdentifiersTable[buffer.ToString()];
+            WordToken op = (WordToken) _reservedWordsTable[buffer.ToString()];
             if (op == null) throw new LexerError(currentLineBuffer, "Invalid operator", Line);
             return op;
         }
@@ -140,7 +156,11 @@ namespace CuteS.LexicalAnalyser
         private Token NextNumber()
         {
             int value = 0;
-            if (_stream[_position] - '0' == 0) _position++;
+            if (_stream[_position] - '0' == 0) 
+            {
+                currentLineBuffer.Add(_stream[_position]);
+                _position++;
+            }
             else {
                 while (_position != _stream.Length && char.IsDigit(_stream[_position]))
                 {
