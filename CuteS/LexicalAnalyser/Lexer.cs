@@ -13,7 +13,7 @@ namespace CuteS.LexicalAnalyser
 
         private int _position = 0;
 
-        public Hashtable _reservedWordsTable { get; private set; } = new();
+        private Hashtable _reservedWordsTable = new();
 
         private List<char> currentLineBuffer = new();
 
@@ -21,9 +21,12 @@ namespace CuteS.LexicalAnalyser
 
         public Hashtable IdentifiersTable { get; private set; } = new();
 
-        public Lexer(string stream)
+        public string Filename {get; private set;}
+
+        public Lexer(string stream, string filename)
         {
             _stream = stream;
+            Filename = filename;
 
             // Reserve keywords
             ReserveWord(WordToken.Namespace);
@@ -79,9 +82,10 @@ namespace CuteS.LexicalAnalyser
             ReserveWord(WordToken.XorAssign);
         }
 
-        public void SetNewStream(string stream)
+        public void SetNewStream(string stream, string filename)
         {
             _stream = stream;
+            Filename = filename;
             _position = 0;
         } 
 
