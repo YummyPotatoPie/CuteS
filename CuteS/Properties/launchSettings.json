@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "CuteS": {
-      "commandName": "Project",
-      "commandLineArgs": "-t -o exampleprogram.cts"
-    }
-  }
-}
