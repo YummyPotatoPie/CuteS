@@ -9,34 +9,15 @@ using CuteS.Parser.AST.Nodes;
 namespace CuteS.Parser
 {
     // Dimitte mihi, quoniam ego sum optimus - (C) Descensus recursive 
-    public class Parser
+    public class Parser : AbstractParser<Ast>
     {
-        private Lexer _lexer;
+        public Parser(Lexer lexer) : base(lexer) { }
 
-        private Token _currentToken;
-
-        public Parser(Lexer lexer)
-        {
-            _lexer = lexer;
-            _currentToken = _lexer.NextToken();
-        }
-
-        private void Match(int tokenTag)
-        {
-            if (_currentToken == null) throw new SyntaxError();
-
-            if (tokenTag == _currentToken.Tag)
-            {
-                _currentToken = _lexer.NextToken();
-            }
-            else throw new SyntaxError();
-        }
-
-        public Ast Parse() => ParseProgram();
+        public override Ast Parse() => ParseProgram();
 
         public Ast Parse(string sourceStream, string filename)
         {
-            _lexer.SetNewStream(sourceStream, filename);
+            Lex.SetNewStream(sourceStream, filename);
             return Parse();
         }
 
@@ -46,7 +27,7 @@ namespace CuteS.Parser
             throw new System.NotImplementedException();
         }
 
-        private ProgramNode Program() => new ProgramNode(Imports(), 0);
+        private ProgramNode Program() => new ProgramNode(Imports(), Namespace(), 0);
 
         private ImportNode[] Imports()
         {
@@ -64,35 +45,47 @@ namespace CuteS.Parser
 
         private ImportNode Import()
         {
-            if (_currentToken.Tag == TokenAttributes.Import)
+            if (CurrentToken.Tag == TokenAttributes.Import)
             {
                 ImportNode import;
-                Match(TokenAttributes.Import); import = new(NamespaceId(), _lexer.Line); Match(';');
+                Match(TokenAttributes.Import); import = new(NamespaceId(), Lex.Line); Match(';');
                 return import;
             }
             else return null;
         }
 
+        private NamespaceNode Namespace()
+        {
+            if (CurrentToken.Tag != TokenAttributes.Namespace) throw new SyntaxError();
+            else 
+            {
+                NamespaceNode namespaceNode;
+                Match(TokenAttributes.Namespace);  namespaceNode = new(NamespaceId(), Lex.Line); Match('{'); /* Parse classes */ Match('}');
+                return namespaceNode;
+            }
+        }
+
         private IdExpression NamespaceId()
         {
-            if (_currentToken.Tag != TokenAttributes.Identifier) throw new SyntaxError();
+            if (CurrentToken.Tag != TokenAttributes.Identifier) throw new SyntaxError();
             else 
             {
                 List<IdentifierNode> identifiers = new();
-                while (_currentToken.Tag != ';')
+                while (true)
                 {
-                    if (_currentToken is WordToken)
+                    if (CurrentToken is WordToken && CurrentToken.Tag == TokenAttributes.Identifier)
                     {
-                        string identifier = ((WordToken) _currentToken).Lexeme;
-                        identifiers.Add(new IdentifierNode(identifier, _lexer.Line));
+                        string identifier = ((WordToken) CurrentToken).Lexeme;
+                        identifiers.Add(new IdentifierNode(identifier, Lex.Line));
                         Match(TokenAttributes.Identifier);
 
-                        if (_currentToken.Tag == TokenAttributes.DotOp) Match(TokenAttributes.DotOp);
+                        if (CurrentToken.Tag == TokenAttributes.DotOp) Match(TokenAttributes.DotOp);
+                        else break;
                     }
                     else throw new SyntaxError();
                 }
 
-                return new IdExpression(identifiers.ToArray(), _lexer.Line);
+                return new IdExpression(identifiers.ToArray(), Lex.Line);
             }
         }
     }
