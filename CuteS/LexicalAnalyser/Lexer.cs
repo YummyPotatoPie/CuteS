@@ -192,10 +192,10 @@ namespace CuteS.LexicalAnalyser
                 }
 
                 if (divisor == 10) throw new LexerError(currentLineBuffer, "Expected number", Line);
-                return new Token((int)floatValue);
+                return new Token((int)floatValue); // FIX IT IMMEDIATELY
 
             }
-            return new Token(value);
+            return new Token(value); // AND THIS
         }
 
         /// <summary>
