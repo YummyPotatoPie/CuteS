@@ -15,13 +15,13 @@ namespace CuteS.LexicalAnalyser
 
         private Hashtable _reservedWordsTable = new();
 
-        private List<char> currentLineBuffer = new();
+        private List<char> _currentLineBuffer = new();
 
         public int Line { get; private set; } = 1;
 
-        public Hashtable IdentifiersTable { get; private set; } = new();
+        public string Filename { get; private set;}
 
-        public string Filename {get; private set;}
+        public Token CurrentToken { get; private set; }
 
         public Lexer(string stream, string filename)
         {
@@ -45,6 +45,8 @@ namespace CuteS.LexicalAnalyser
             ReserveWord(WordToken.Float);
             ReserveWord(WordToken.String);
             ReserveWord(WordToken.Bool);
+            ReserveWord(WordToken.True);
+            ReserveWord(WordToken.False);
 
             // Reserve operators
             ReserveWord(WordToken.Add);
@@ -98,17 +100,17 @@ namespace CuteS.LexicalAnalyser
                 if (_stream[_position] == '\n')
                 {
                     Line++;
-                    currentLineBuffer.Clear();
+                    _currentLineBuffer.Clear();
                     _position++;
                     continue;
                 }
                 if (_stream[_position] == '\t')
                 {
-                    for (int i = 0; i < 4; i++) currentLineBuffer.Add(' ');
+                    for (int i = 0; i < 4; i++) _currentLineBuffer.Add(' ');
                     _position++;
                     continue;
                 }
-                currentLineBuffer.Add(_stream[_position]);
+                _currentLineBuffer.Add(_stream[_position]);
                 _position++;
             }
         }
@@ -121,15 +123,17 @@ namespace CuteS.LexicalAnalyser
 
             while (_position != _stream.Length && IsOperatorSymbol(_stream[_position]))
             {
-                currentLineBuffer.Add(_stream[_position]);
+                _currentLineBuffer.Add(_stream[_position]);
                 buffer.Append(_stream[_position]);
                 _position++;
             }
 
             WordToken op = (WordToken) _reservedWordsTable[buffer.ToString()];
-            if (op == null) throw new LexerError(currentLineBuffer, "Invalid operator", Line);
+            if (op == null) throw new LexerError(_currentLineBuffer, "Invalid operator", Line);
             return op;
         }
+
+        // TODO: NextLiteral() method for tokeniza lexemes like this "str" or "rtsdfFERGERGsdFQWRGERG2342ERDE2"
 
         private WordToken NextWord()
         {
@@ -140,16 +144,14 @@ namespace CuteS.LexicalAnalyser
                 while (_position != _stream.Length && (char.IsLetterOrDigit(_stream[_position]) || _stream[_position] == '_'))
                 {
                     buffer.Append(_stream[_position]);
-                    currentLineBuffer.Add(_stream[_position]);
+                    _currentLineBuffer.Add(_stream[_position]);
                     _position++;
                 }
+                string identifier = buffer.ToString();
 
-                WordToken token = (WordToken) _reservedWordsTable[buffer.ToString()];
+                WordToken token = (WordToken) _reservedWordsTable[identifier];
                 if (token != null) return token;
-
-                token = new(buffer.ToString());
-                IdentifiersTable.Add(token.Lexeme, token);
-                return token;
+                return new WordToken(identifier);
             }
             catch (ArgumentOutOfRangeException)
             {
@@ -162,36 +164,36 @@ namespace CuteS.LexicalAnalyser
             int value = 0;
             if (_stream[_position] - '0' == 0) 
             {
-                currentLineBuffer.Add(_stream[_position]);
+                _currentLineBuffer.Add(_stream[_position]);
                 _position++;
             }
             else {
                 while (_position != _stream.Length && char.IsDigit(_stream[_position]))
                 {
-                    currentLineBuffer.Add(_stream[_position]);
+                    _currentLineBuffer.Add(_stream[_position]);
                     value = value * 10 + _stream[_position] - '0';
                     _position++;
                 }
             }
 
-            if (_position != _stream.Length && value == 0 && char.IsDigit(_stream[_position])) throw new LexerError(currentLineBuffer, "Invalid number entry", Line);
+            if (_position != _stream.Length && value == 0 && char.IsDigit(_stream[_position])) throw new LexerError(_currentLineBuffer, "Invalid number entry", Line);
 
             if (_position != _stream.Length && _stream[_position] == '.')
             {
                 float floatValue = value;
                 int divisor = 10;
 
-                currentLineBuffer.Add(_stream[_position]);
+                _currentLineBuffer.Add(_stream[_position]);
                 _position++;
                 while (_position != _stream.Length && char.IsDigit(_stream[_position]))
                 {
-                    currentLineBuffer.Add(_stream[_position]);
+                    _currentLineBuffer.Add(_stream[_position]);
                     floatValue += (_stream[_position] - '0') / divisor;
                     divisor *= 10;
                     _position++;
                 }
 
-                if (divisor == 10) throw new LexerError(currentLineBuffer, "Expected number", Line);
+                if (divisor == 10) throw new LexerError(_currentLineBuffer, "Expected number", Line);
                 return new Token((int)floatValue); // FIX IT IMMEDIATELY
 
             }
@@ -232,24 +234,21 @@ namespace CuteS.LexicalAnalyser
             if (char.IsDigit(currentSymbol)) return NextNumber();
             if (IsOperatorSymbol(currentSymbol)) return NextOperator();
 
-            currentLineBuffer.Add(_stream[_position]);
+            _currentLineBuffer.Add(_stream[_position]);
             _position++;
             return new Token(currentSymbol);
         }
 
-        public Token NextToken()
+        public void NextToken()
         {
             try
             {
-                return ReadNextToken();
+                CurrentToken = ReadNextToken();
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Compilation error:\n{ex.Message}\n\n{PanicMode()}");
                 Environment.Exit(1);
-                
-                // Useless return statements just needed to compile this without errors
-                return null;
             }
         }
     }
