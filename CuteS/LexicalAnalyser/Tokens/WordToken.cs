@@ -15,7 +15,9 @@
             While       = new("while", TokenAttributes.While),
             If          = new("if", TokenAttributes.If),
             Else        = new("else", TokenAttributes.Else),
-            Return      = new("return", TokenAttributes.Return);
+            Return      = new("return", TokenAttributes.Return),
+            True        = new("True", TokenAttributes.True),
+            False       = new("False", TokenAttributes.False);
 
         // Primitive types
         public readonly static WordToken
