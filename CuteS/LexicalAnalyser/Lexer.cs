@@ -134,6 +134,24 @@ namespace CuteS.LexicalAnalyser
         }
 
         // TODO: NextLiteral() method for tokeniza lexemes like this "str" or "rtsdfFERGERGsdFQWRGERG2342ERDE2"
+        private WordToken NextLiteral()
+        {
+            StringBuilder buffer = new();
+
+            _position++;
+            while (_position != _stream.Length && _stream[_position] != '"')
+            {
+                buffer.Append(_stream[_position]);
+                _position++;
+            }
+
+            if (_position == _stream.Length) throw new LexerError("Unexpected end of file", Line);
+            else 
+            {
+                _position++;
+                return new WordToken(buffer.ToString(), TokenAttributes.String);
+            }
+        }
 
         private WordToken NextWord()
         {
@@ -180,7 +198,7 @@ namespace CuteS.LexicalAnalyser
 
             if (_position != _stream.Length && _stream[_position] == '.')
             {
-                float floatValue = value;
+                double floatValue = value;
                 int divisor = 10;
 
                 _currentLineBuffer.Add(_stream[_position]);
@@ -194,10 +212,10 @@ namespace CuteS.LexicalAnalyser
                 }
 
                 if (divisor == 10) throw new LexerError(_currentLineBuffer, "Expected number", Line);
-                return new Token((int)floatValue); // FIX IT IMMEDIATELY
+                return new NumberToken(floatValue, TokenAttributes.Float); 
 
             }
-            return new Token(value); // AND THIS
+            return new NumberToken(value, TokenAttributes.Int); 
         }
 
         /// <summary>
@@ -233,6 +251,7 @@ namespace CuteS.LexicalAnalyser
             if (char.IsLetter(currentSymbol) || currentSymbol == '_') return NextWord();
             if (char.IsDigit(currentSymbol)) return NextNumber();
             if (IsOperatorSymbol(currentSymbol)) return NextOperator();
+            if (currentSymbol == '"') return NextLiteral();
 
             _currentLineBuffer.Add(_stream[_position]);
             _position++;
