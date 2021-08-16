@@ -1,7 +1,7 @@
 <program>		::= <imports> <namespace>
 
 <imports>		::= <import> <imports> | ""
-<import>		::= "import" <file-path> ";" | 
+<import>        ::= "import" <file-path> ";" | 
                     "import" "<" <id> ">" ";" | % Special import (StdLibFiles or System) %
                     ""
 <file-path>     ::= <literal>
