@@ -1,8 +1,22 @@
 <program>		::= <imports> <namespace>
 
 <imports>		::= <import> <imports> | ""
-<import>		::= "import" <namespace-id> ";" | ""
-<namespace-id>	::= <id> | <id> "." <namespace-id>
+<import>		::= "import" <file-path> ";" | 
+                    "import" "<" <id> ">" ";" | % Special import (StdLibFiles or System) %
+                    ""
+<file-path>     ::= <literal>
+<literal>       ::= '"' <id> '"'
+
+<id>            ::= ([_a-zA-Z][_a-zA-Z0-9])
+<rel-id>        ::= <call> "." <rel-id> | <call>
+<call>          ::= <function-call> | <id>
+<function-call> ::= <id> "(" <args> ")"
+<args>          ::= <arg> "," <args> | <arg> 
+<arg>           ::= <value-expression> | <rel-id>
+
+<number>        ::= (("0"("."[0-9]+)?)|[1-9][0-9]*("."[0-9]+)?)
+
+<lvalue>        ::= <id> "." <id> | <id>
 
 <namespace>		::= "namespace" <id> "{" <classes> "}"
 <classes>		::= <class> <classes> | ""
@@ -10,11 +24,92 @@
 <class-body>	::= <declaration> <class-body> | <function> <class-body> | ""
 
 <declaration>	::= "let" <id> ":" <type> <assigment> ";"
-<function>		::= "fn" <type> <id> "(" <params> ")" "{" <function-body> "}"
+<function>		::= "fn" <id> "(" <params> ")" ":" <type> "{" <function-body> "}"
 
-<assigment>		::= "=" <expression> | ""
+<type>          ::= <id> "." <id> | 
+                    <id> | "Int" | "Float" | "String" | "Bool"
+
+<assigment>		::= "=" <value-expression> | ""
 <params>		::= <param> <params> | <param> "," <params> | ""
 <param>			::= <id> ":" <type>
 
 <function-body>	::= <statements>
 <statements>	::= <statement> <statements> | ""
+
+<statement>     ::= "if" "(" <value-expression> ")" <statement> |
+                    "if" "(" <value-expression> ")" "{" <statements> "}" | 
+                    "else" <statement> |
+                    "else" "{" <statements> "}"
+                    "for" "(" <iterator-declaration> ";" <for-value-expression> ";" <for-relation-expression> ") <statement> |
+                    "for" "(" <iterator-declaration> ";" <for-value-expression> ";" <for-relation-expression> ") "{" <statements> "}" |
+                    "while" "(" <value-expression> ")" <statement> |
+                    "while" "(" <value-expression> ")" "{" <statements> "}" | 
+                    "return" <value-expression> ";" | 
+                    <declaration> | 
+                    <relation-expression>  | ""
+
+<iterator-declaration>      ::= <declaration> | <relation-expression> | ""
+<for-value-expression>      ::= <value-expression> | ""
+<for-relation-expression>   ::= <relation-expression> | ""
+
+
+<expression>        ::=     <relation-expression> | <value-expression>
+                    
+<relation-expression>      ::=  <lvalue> "=" <value-expression>   |
+                                <lvalue> "+=" <value-expression>  |
+                                <lvalue> "-=" <value-expression>  |
+                                <lvalue> "*=" <value-expression>  |
+                                <lvalue> "/=" <value-expression>  |
+                                <lvalue> "%=" <value-expression>  |
+                                <lvalue> "&=" <value-expression>  |
+                                <lvalue> "|=" <value-expression>  |
+                                <lvalue> "^=" <value-expression>  |
+                                <lvalue> "<<=" <value-expression> |
+                                <lvalue> ">>=" <value-expression> 
+
+<value-expression>  ::=     <value-expression> "||" <booland-term> |
+                            <booland-term>
+
+<booland-term>      ::=     <booland-term> "&&" <bitor-term> |
+                            <bitor-term>
+
+<bitor-term>        ::=     <bitor-term> "|" <xor-term> |
+                            <xor-term>
+
+<xor-term>          ::=     <xor-term> "^" <bitand-term> |
+                            <bitand-term>
+
+<bitand-term>       ::=     <bitand-term> "&" <rel-term> |
+                            <rel-term>
+
+<rel-term>          ::=     <rel-term> "==" <eq-rel-term> |
+                            <rel-term> "!=" <eq-rel-term> |
+                            <eq-rel-term>
+
+<eq-rel-term>       ::=     <eq-rel-term> "<"  <shift-term> |
+                            <eq-rel-term> ">"  <shift-term> |
+                            <eq-rel-term> "<=" <shift-term> |
+                            <eq-rel-term> ">=" <shift-term> |
+                            <shift-term>
+
+<shift-term>        ::=     <shift-term> ">>" <add-term> |
+                            <shift-term> "<<" <add-term> |
+                            <add-term>
+
+<add-term>          ::=     <add-term> "+" <mult-term> |
+                            <add-term> "-" <mult-term> |
+                            <mult-term>
+
+<mult-term>         ::=     <mult-term> "*" <unary> |
+                            <mult-term> "/" <unary> |
+                            <mult-term> "%" <unary> |
+                            <unary>
+
+<unary>             ::=     "!" <factor> | 
+                            "~" <factor> |
+                            "^" <factor> |
+                            "+" <factor> |
+                            "-" <factor> |
+                            <factor>    
+
+<factor>            ::= "(" <value-expression> ")" | <rel-id> | <number> | <literal>
