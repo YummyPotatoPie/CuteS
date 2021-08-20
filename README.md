@@ -39,13 +39,13 @@ namespace HelloWorld
 ## Features of CuteS
 - #### Every classes are public 
 ```C#
-// CuteS                                                              C# \\
+// CuteS                                       // C#
 class PublicClass { }                          public class PublicClass { } 
 ```
 
 - #### Every fields and methods in classes are public
 ```C#
-// CuteS                                                              C# \\
+// CuteS                                       // C#
 class PublicClass                              public class PublicClass
 {                                              {
     let int: Field = 1;                             public int Field = 1;
