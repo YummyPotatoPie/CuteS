@@ -3,7 +3,6 @@
 ## Minimal program at CuteS
 
 ```CuteS
-
 namespace HelloWorld
 {
     class Example
@@ -14,5 +13,4 @@ namespace HelloWorld
         }    
     }
 }
-
 ```
