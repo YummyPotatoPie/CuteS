@@ -19,14 +19,11 @@ namespace CuteS.LexicalAnalyser
 
         public int Line { get; private set; } = 1;
 
-        public string Filename { get; private set;}
-
         public Token CurrentToken { get; private set; }
 
-        public Lexer(string stream, string filename)
+        public Lexer(string stream)
         {
             _stream = stream;
-            Filename = filename;
 
             // Reserve keywords
             ReserveWord(WordToken.Namespace);
@@ -45,6 +42,7 @@ namespace CuteS.LexicalAnalyser
             ReserveWord(WordToken.Float);
             ReserveWord(WordToken.String);
             ReserveWord(WordToken.Bool);
+            ReserveWord(WordToken.Void);
             ReserveWord(WordToken.True);
             ReserveWord(WordToken.False);
 
@@ -55,7 +53,6 @@ namespace CuteS.LexicalAnalyser
             ReserveWord(WordToken.BitAnd);
             ReserveWord(WordToken.BitAndAssign);
             ReserveWord(WordToken.BitNot);
-            ReserveWord(WordToken.BitNotAssign);
             ReserveWord(WordToken.BitOr);
             ReserveWord(WordToken.BitOrAssign);
             ReserveWord(WordToken.BoolAnd);
@@ -83,13 +80,6 @@ namespace CuteS.LexicalAnalyser
             ReserveWord(WordToken.Xor);
             ReserveWord(WordToken.XorAssign);
         }
-
-        public void SetNewStream(string stream, string filename)
-        {
-            _stream = stream;
-            Filename = filename;
-            _position = 0;
-        } 
 
         private void ReserveWord(WordToken word) => _reservedWordsTable.Add(word.Lexeme, word);
 
