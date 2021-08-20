@@ -3,90 +3,64 @@ using System.Collections.Generic;
 using CuteS.LexicalAnalyser;
 using CuteS.LexicalAnalyser.Tokens;
 
-using CuteS.Parser.AstNodes;
+using CuteS.SyntaxAnalyser.AstNodes;
+using CuteS.SyntaxAnalyser.AstNodes.ExpressionNodes;
 
-namespace CuteS.Parser
+namespace CuteS.SyntaxAnalyser
 {
-    // Dimitte mihi, quoniam ego sum optimus - (C) Descensus recursive 
-    public class Parser : AbstractParser<ProgramNode>
+    public sealed class Parser : AbstractParser<Program>
     {
-        public Parser(Lexer lexer) : base(ref lexer) => Lex.NextToken();
+        public Parser(ref Lexer lex) : base(ref lex) => Lex.NextToken();
 
-        public override ProgramNode Parse() => ParseProgram();
-
-        public ProgramNode Parse(string sourceStream, string filename)
+        public override Program Parse() 
         {
-            Lex.SetNewStream(sourceStream, filename);
-            return Parse();
+            List<Import> imports = new();
+
+            while (Lex.CurrentToken.Tag == TokenAttributes.Import) imports.Add(Import());
+
+            if (Lex.CurrentToken.Tag != TokenAttributes.Namespace) throw new SyntaxError("Expected namespace body", Lex.Line);
+            else return new Program(imports.ToArray(), Namespace(), Lex.Line);
         }
 
-        private ProgramNode ParseProgram()
+        private Import Import()
         {
-            return Program();
-            throw new System.NotImplementedException();
-        }
+            Import import;
+            Match(TokenAttributes.Import);
 
-        private ProgramNode Program() => new ProgramNode(Imports(), Namespace(), 0);
-
-        private ImportNode[] Imports()
-        {
-            List<ImportNode> imports = new();
-            ImportNode import = Import();
-
-            while (import != null)
+            if (Lex.CurrentToken.Tag == TokenAttributes.Lower)
             {
-                imports.Add(import);
-                import = Import();
+                Match(TokenAttributes.Lower); 
+                if (Lex.CurrentToken is WordToken token && token.Tag == TokenAttributes.Identifier) import = new(new Identifier(token, Lex.Line), true, Lex.Line);
+                else throw new SyntaxError("Expected identifier", Lex.Line);
+                Match(Lex.CurrentToken.Tag);
+                Match(TokenAttributes.Greater);
             }
-
-            return imports.ToArray();
-        }
-
-        private ImportNode Import()
-        {
-            if (Lex.CurrentToken.Tag == TokenAttributes.Import)
-            {
-                ImportNode import;
-                Match(TokenAttributes.Import); import = new(NamespaceId(), Lex.Line); Match(';');
-                return import;
-            }
-            else return null;
-        }
-
-        private NamespaceNode Namespace()
-        {
-            if (Lex.CurrentToken.Tag != TokenAttributes.Namespace) throw new SyntaxError();
             else 
             {
-                IdExpression namespaceName;
-                ClassesNode classes;
-                Match(TokenAttributes.Namespace);  namespaceName = NamespaceId(); Match('{'); classes = new ClassesParser(ref Lex).Parse(); Match('}');
-                return new NamespaceNode(namespaceName, classes, Lex.Line);
+                if (Lex.CurrentToken is WordToken token && token.Tag == TokenAttributes.String) import = new(new Identifier(token, Lex.Line), false, Lex.Line);
+                else throw new SyntaxError("Expected literal", Lex.Line);
+                Match(Lex.CurrentToken.Tag);
             }
+            Match(';');
+            return import;
         }
 
-        private IdExpression NamespaceId()
+        private Namespace Namespace()
         {
-            if (Lex.CurrentToken.Tag != TokenAttributes.Identifier) throw new SyntaxError();
-            else 
-            {
-                List<IdentifierNode> identifiers = new();
-                while (true)
-                {
-                    if (Lex.CurrentToken is WordToken token && Lex.CurrentToken.Tag == TokenAttributes.Identifier)
-                    {
-                        string identifier = token.Lexeme;
-                        identifiers.Add(new IdentifierNode(identifier, Lex.Line));
-                        Match(TokenAttributes.Identifier);
+            Identifier namespaceName;
+            List<Class> namespaceClasses = new();
+            Match(TokenAttributes.Namespace);
 
-                        if (Lex.CurrentToken.Tag == TokenAttributes.DotOp) Match(TokenAttributes.DotOp);
-                        else break;
-                    }
-                    else throw new SyntaxError();
-                }
+            if (Lex.CurrentToken is WordToken token && token.Tag == TokenAttributes.Identifier) namespaceName = new(token, Lex.Line);
+            else throw new SyntaxError("Expected identifier", Lex.Line);
+            Match(Lex.CurrentToken.Tag);
 
-                return new IdExpression(identifiers.ToArray(), Lex.Line);
-            }
+            Match('{');
+            while (Lex.CurrentToken.Tag != '}') namespaceClasses.Add(Class());
+            Match('}');
+            return new Namespace(namespaceName, namespaceClasses.ToArray(), Lex.Line);
         }
+
+        private Class Class() => new ClassParser(ref Lex).Parse();
     }
 }
