@@ -3,5 +3,16 @@
 ## Minimal program at CuteS
 
 ```CuteS
----Under construction---
+
+namespace HelloWorld
+{
+    class Example
+    {
+        fn int: Square(int: x)
+        {
+            return x * x;
+        }    
+    }
+}
+
 ```
