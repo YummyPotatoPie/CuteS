@@ -7,8 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 - Semantic analyser of intermediate representation of code
 - Stable parser of code
+- Formatter for transpiled code
 
-## [0.0.1] - 2021-08-20
+## [0.1.1] - 2021-08-21
+### Added
+- Emit() method for abstract syntax tree nodes
+- IdentifierCall() method for ExpressionParser
+
+### Fixed
+- Exception caused by reference to null expression
+
+## [0.1.0] - 2021-08-20
 ### Added
 - Pre-stable parser
 - Stable lexer 
