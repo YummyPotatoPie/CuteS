@@ -168,6 +168,11 @@ namespace CuteS.SyntaxAnalyser
                 Match(token.Tag);
                 return new UnaryOperator(UnaryTerm(), token, Lex.Line);
             }
+            else if (Lex.CurrentToken is WordToken wordToken && wordToken.Tag == TokenAttributes.New)
+            {
+                Match(wordToken.Tag);
+                return new UnaryOperator(IdentifierCall(), wordToken, Lex.Line);
+            }
             else return FactorTerm();
         }
 
