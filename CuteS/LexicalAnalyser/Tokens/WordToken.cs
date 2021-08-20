@@ -21,10 +21,11 @@
 
         // Primitive types
         public readonly static WordToken
-            Int         = new("Int", TokenAttributes.Int),
-            Float       = new("Float", TokenAttributes.Float),
-            Bool        = new("Bool", TokenAttributes.Bool),
-            String      = new("String", TokenAttributes.String);
+            Int         = new("int", TokenAttributes.Int),
+            Float       = new("float", TokenAttributes.Float),
+            Bool        = new("bool", TokenAttributes.Bool),
+            String      = new("string", TokenAttributes.String),
+            Void        = new("void", TokenAttributes.Void);
 
         // Operators
         public readonly static WordToken
@@ -38,7 +39,6 @@
             BitAndAssign    = new("&=", TokenAttributes.BitAndAssign),
             BitOrAssign     = new("|=", TokenAttributes.BitOrAssign),
             XorAssign       = new("^=", TokenAttributes.XorAssign),
-            BitNotAssign    = new("~=", TokenAttributes.BitNotAssign),
             NotEq           = new("!=", TokenAttributes.NotEq),
             Eq              = new("==", TokenAttributes.Eq),
             GreaterEq       = new(">=", TokenAttributes.GreaterEq),
@@ -69,5 +69,7 @@
         /// <param name="lexeme">Lexeme that represents token</param>
         /// <param name="tag">Default value is 256 that equal TokenAttribute.Identifier</param>
         public WordToken(string lexeme, int tag = 256) : base(tag) => Lexeme = lexeme;
+
+        public override string ToString() => Lexeme;
     }
 }

@@ -30,7 +30,7 @@
             BitAndAssign    = 281,
             BitOrAssign     = 282,
             XorAssign       = 283,
-            BitNotAssign    = 284,
+            Void            = 284,
             NotEq           = 285,
             Eq              = 286,
             GreaterEq       = 287,
