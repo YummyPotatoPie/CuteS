@@ -58,6 +58,8 @@ namespace CuteS.SyntaxAnalyser
             Match('{');
             while (Lex.CurrentToken.Tag != '}') namespaceClasses.Add(Class());
             Match('}');
+
+            if (namespaceClasses.Count == 0) throw new SyntaxError("Namespace must contains at least 1 class", Lex.Line);
             return new Namespace(namespaceName, namespaceClasses.ToArray(), Lex.Line);
         }
 
