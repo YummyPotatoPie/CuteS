@@ -1,115 +1,79 @@
-<program>		::= <imports> <namespace>
+<id>                ::= ([_a-zA-Z][_a-zA-Z0-9])
+<number>            ::= (("0"("."[0-9]+)?)|[1-9][0-9]*("."[0-9]+)?)
+<literal>           ::= '"' <any-symbol> '"'
 
-<imports>		::= <import> <imports> | ""
-<import>        ::= "import" <file-path> ";" | 
-                    "import" "<" <id> ">" ";" | % Special import (StdLibFiles or System) %
-                    ""
-<file-path>     ::= <literal>
-<literal>       ::= '"' <id> '"'
+<program>		    ::= <imports> <namespace>
 
-<id>            ::= ([_a-zA-Z][_a-zA-Z0-9])
-<rel-id>        ::= <call> "." <rel-id> | <call>
-<call>          ::= <function-call> | <id>
-<function-call> ::= <id> "(" <args> ")"
-<args>          ::= <arg> "," <args> | <arg> 
-<arg>           ::= <value-expression> | <rel-id>
+<imports>		    ::= <import> <imports> | ""
+<import>            ::= "import" <literal> ";" | "import" "<" <id> ">" ";" | "" 
 
-<number>        ::= (("0"("."[0-9]+)?)|[1-9][0-9]*("."[0-9]+)?)
+<namespace>		    ::= "namespace" <id> "{" <classes> "}"
+<classes>		    ::= <class> <classes> | ""
+<class>			    ::= "class" <id> "{" <class-body> "}"
+<class-body>	    ::= <declaration> <class-body> | <function> <class-body> | ""
 
-<lvalue>        ::= <id> "." <id> | <id>
+<declaration>       ::= "let" <type> ":" <assign-expression> ";"
+<type>              ::= <id> "." <id> | <id> | <primitive-type>
+<primitive-type>    ::= "int" | "float" | "string" | "void" | "bool"
 
-<namespace>		::= "namespace" <id> "{" <classes> "}"
-<classes>		::= <class> <classes> | ""
-<class>			::= "class" <id> "{" <class-body> "}"
-<class-body>	::= <declaration> <class-body> | <function> <class-body> | ""
+<function>          ::= "fn" <type> ":" <id> "(" <args> ")" "{" <statements "}"
+<args>              ::= <arg> "," <args> | <arg> | ""
+<arg>               ::= <type> ":" <id>
 
-<declaration>	::= "let" <id> ":" <type> <assigment> ";"
-<function>		::= "fn" <id> "(" <params> ")" ":" <type> "{" <function-body> "}"
+<statements>        ::= <statement> <statements> | ""
+<statement>         ::= <if-statement>      |
+                        <while-statement>   |
+                        <for-statement>     |
+                        <return-statement>  |
+                        <declaration>       |
+                        <assign-expression>
 
-<type>          ::= <id> "." <id> | 
-                    <id> | "Int" | "Float" | "String" | "Bool"
+<if-statement>      ::= "if" "(" <value-expression> ")" "{" <statements> "}" <else>
+<else>              ::= "else" <if-statement> | "else" "{" <statements> "}" | ""
 
-<assigment>		::= "=" <value-expression> | ""
-<params>		::= <param> <params> | <param> "," <params> | ""
-<param>			::= <id> ":" <type>
+<while-statement>   ::= "while" "(" <value-expression> ")" "{" <statements> "}" 
 
-<function-body>	::= <statements>
-<statements>	::= <statement> <statements> | ""
+<for-statement>     ::= "for" "(" <iterator> ";" <value-expression> ";" <assign-expression> ")" "{" <statements> "}"
+<iterator>          ::= <declaration> | <assign-expression>
 
-<statement>     ::= "if" "(" <value-expression> ")" <statement> |
-                    "if" "(" <value-expression> ")" "{" <statements> "}" | 
-                    "else" <statement> |
-                    "else" "{" <statements> "}"
-                    "for" "(" <iterator-declaration> ";" <for-value-expression> ";" <for-relation-expression> ") <statement> |
-                    "for" "(" <iterator-declaration> ";" <for-value-expression> ";" <for-relation-expression> ") "{" <statements> "}" |
-                    "while" "(" <value-expression> ")" <statement> |
-                    "while" "(" <value-expression> ")" "{" <statements> "}" | 
-                    "return" <value-expression> ";" | 
-                    <declaration> | 
-                    <relation-expression>  | ""
+<return-statement>  ::= "return" <value-expression> ";"
 
-<iterator-declaration>      ::= <declaration> | <relation-expression> | ""
-<for-value-expression>      ::= <value-expression> | ""
-<for-relation-expression>   ::= <relation-expression> | ""
+<assign-expression> ::= <lvalue> <assign-operator> <value-expression>
 
+<lvalue>            ::= <id> "." <lvalue> | <id>
+<assign-operator>   ::= "=" | "+=" | "-=" | "/=" | "*=" | "%=" | "&=" | "|=" | ">>=" | "<<=" | "^="
 
-<expression>        ::=     <relation-expression> | <value-expression>
-                    
-<relation-expression>      ::=  <lvalue> "=" <value-expression>   |
-                                <lvalue> "+=" <value-expression>  |
-                                <lvalue> "-=" <value-expression>  |
-                                <lvalue> "*=" <value-expression>  |
-                                <lvalue> "/=" <value-expression>  |
-                                <lvalue> "%=" <value-expression>  |
-                                <lvalue> "&=" <value-expression>  |
-                                <lvalue> "|=" <value-expression>  |
-                                <lvalue> "^=" <value-expression>  |
-                                <lvalue> "<<=" <value-expression> |
-                                <lvalue> ">>=" <value-expression> 
+<value-expression>  ::= <bool-or-term>
 
-<value-expression>  ::=     <value-expression> "||" <booland-term> |
-                            <booland-term>
-
-<booland-term>      ::=     <booland-term> "&&" <bitor-term> |
-                            <bitor-term>
-
-<bitor-term>        ::=     <bitor-term> "|" <xor-term> |
-                            <xor-term>
-
-<xor-term>          ::=     <xor-term> "^" <bitand-term> |
-                            <bitand-term>
-
-<bitand-term>       ::=     <bitand-term> "&" <rel-term> |
-                            <rel-term>
-
-<rel-term>          ::=     <rel-term> "==" <eq-rel-term> |
-                            <rel-term> "!=" <eq-rel-term> |
-                            <eq-rel-term>
-
-<eq-rel-term>       ::=     <eq-rel-term> "<"  <shift-term> |
-                            <eq-rel-term> ">"  <shift-term> |
-                            <eq-rel-term> "<=" <shift-term> |
-                            <eq-rel-term> ">=" <shift-term> |
-                            <shift-term>
-
-<shift-term>        ::=     <shift-term> ">>" <add-term> |
-                            <shift-term> "<<" <add-term> |
-                            <add-term>
-
-<add-term>          ::=     <add-term> "+" <mult-term> |
-                            <add-term> "-" <mult-term> |
-                            <mult-term>
-
-<mult-term>         ::=     <mult-term> "*" <unary> |
-                            <mult-term> "/" <unary> |
-                            <mult-term> "%" <unary> |
-                            <unary>
-
-<unary>             ::=     "!" <factor> | 
-                            "~" <factor> |
-                            "^" <factor> |
-                            "+" <factor> |
-                            "-" <factor> |
-                            <factor>    
-
-<factor>            ::= "(" <value-expression> ")" | <rel-id> | <number> | <literal>
+<bool-or-term>      ::= <bool-or-term> "||" <bool-and-term> | <bool-and-term>
+<bool-and-term>     ::= <bool-and-term> "&&" <bit-or-term> | <bit-or-term>
+<bit-or-term>       ::= <bit-or-term> "|" <bit-xor-term> | <bit-xor-term>
+<bit-xor-term>      ::= <bit-xor-term> "^" <bit-and-term> | <bit-and-term>
+<bit-and-term>      ::= <bit-and-term> "&" <rel-term> | <rel-term>
+<rel-term>          ::= <rel-term> "==" <rel-eq-term> | 
+                        <rel-term> "!=" <rel-eq-term> |
+                        <rel-eq-term>
+<rel-eq-term>       ::= <rel-eq-term> "<" <shift-term>  | 
+                        <rel-eq-term> ">" <shift-term>  |
+                        <rel-eq-term> "<=" <shift-term> |
+                        <rel-eq-term> ">=" <shift-term> |
+                        <shift-term>
+<shift-term>        ::= <shift-term> ">>" <add-term> |
+                        <shift-term> "<<" <add-term> |
+                        <add-term>
+<add-term>          ::= <add-term> "+" <mult-term> |
+                        <add-term> "-" <mult-term> |
+                        <mult-term>
+<mult-term>         ::= <mult-term> "*" <unary-term> |
+                        <mult-term> "/" <unary-term> |
+                        <mult-term> "%" <unary-term>
+<unary-term>        ::= "!" <unary> |
+                        "-" <unary> |
+                        "+" <unary> |
+                        "~" <unary> |
+                        <factor>
+<factor>            ::= "(" <bool-or-term> ")" | <number> | <literal> | <id-call> 
+<id-call>           ::= <id-call-term> "." <id-call> | <id-call-term>
+<id-call-term>      ::= <id> | <function-call>
+<function-call>     ::= <id> "(" <args-values> ")"
+<args-values>       ::= <value-expression> "," <args-values> | <value-expression>
