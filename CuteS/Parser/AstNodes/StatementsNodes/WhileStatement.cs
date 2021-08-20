@@ -1,3 +1,5 @@
+using System.Text;
+
 using CuteS.SyntaxAnalyser.AstNodes.ExpressionNodes;
 
 namespace CuteS.SyntaxAnalyser.AstNodes.StatementsNodes
@@ -12,6 +14,24 @@ namespace CuteS.SyntaxAnalyser.AstNodes.StatementsNodes
         {
             Condition = condition;
             Statements = statements;
+        }
+
+        public override string Emit()
+        {
+            StringBuilder statements = new();
+
+            foreach (Statement statement in Statements) statements.Append(statement.Emit()).Append('\n');
+
+            return $"\nwhile ({Condition.Emit()})\n{{\n{statements}}}";
+        }
+
+        public override string ToString()
+        {
+            StringBuilder statements = new();
+
+            foreach (Statement statement in Statements) statements.Append(statement.ToString());
+
+            return $"While(Condition({Condition});Statements({statements}););";
         }
     }
 }

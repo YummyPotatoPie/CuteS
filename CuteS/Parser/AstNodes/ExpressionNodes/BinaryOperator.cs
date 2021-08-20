@@ -13,5 +13,13 @@ namespace CuteS.SyntaxAnalyser.AstNodes.ExpressionNodes
             Left = left;
             Right = right;
         }
+
+        public override string Emit() 
+        {
+            if (OperatorType.Tag == TokenAttributes.DotOp) return $"{Left.Emit()}{OperatorType.Lexeme}{Right.Emit()}";
+            return $"{Left.Emit()} {OperatorType.Lexeme} {Right.Emit()}";
+        }
+
+        public override string ToString() => $"BinOp(Left({Left});Op({OperatorType});Right({Right}););";
     }
 }

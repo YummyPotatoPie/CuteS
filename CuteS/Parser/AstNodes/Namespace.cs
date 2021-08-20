@@ -1,3 +1,5 @@
+using System.Text;
+
 using CuteS.SyntaxAnalyser.AstNodes.ExpressionNodes;
 
 namespace CuteS.SyntaxAnalyser.AstNodes
@@ -12,6 +14,24 @@ namespace CuteS.SyntaxAnalyser.AstNodes
         {
             NamespaceName = namespaceName;
             Classes = classes;
+        }
+
+        public override string Emit()
+        {
+            StringBuilder classes = new();
+
+            foreach (Class clazz in Classes) classes.Append(clazz.Emit()).Append('\n');
+
+            return $"namespace {NamespaceName.Emit()}\n{{\n\n{classes}\n}}";
+        }
+
+        public override string ToString()
+        {
+            StringBuilder classes = new();
+
+            foreach (Class clazz in Classes) classes.Append(clazz.ToString());
+
+            return $"Namespace(NamespaceName({NamespaceName});Classes({classes});";
         }
     }
 }

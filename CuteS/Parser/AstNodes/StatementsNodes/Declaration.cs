@@ -13,5 +13,9 @@ namespace CuteS.SyntaxAnalyser.AstNodes.StatementsNodes
             IdentifierType = identifierType;
             AssignExpression = assignExpression;
         }
+
+        public override string Emit() => $"{IdentifierType.Emit()} {AssignExpression.Emit()};";
+
+        public override string ToString() => $"Declaration({IdentifierType.Emit()}{AssignExpression.Emit()});";
     }
 }

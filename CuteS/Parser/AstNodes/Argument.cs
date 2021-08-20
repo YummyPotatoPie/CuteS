@@ -13,5 +13,9 @@ namespace CuteS.SyntaxAnalyser.AstNodes
             ArgumentName = argumentName;
             ArgumentType = argumentType;
         }
+
+        public override string Emit() => $"{ArgumentType.Emit()} {ArgumentName.Emit()}";
+
+        public override string ToString() => $"Argument(ArgumentName({ArgumentName});ArgumentType({ArgumentType}););";
     }
 }

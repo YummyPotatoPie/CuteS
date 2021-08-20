@@ -13,5 +13,9 @@ namespace CuteS.SyntaxAnalyser.AstNodes
             IsSpecialImport = isSpecialImport;
             ImportName = importName;
         }
+
+        public override string Emit() => $"using {ImportName.Emit()};";
+
+        public override string ToString() => $"Import({ImportName}IsSpecialImport({IsSpecialImport}););";
     }
 }

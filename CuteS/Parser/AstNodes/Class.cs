@@ -1,5 +1,6 @@
-using CuteS.SyntaxAnalyser.AstNodes.ExpressionNodes;
+using System.Text;
 
+using CuteS.SyntaxAnalyser.AstNodes.ExpressionNodes;
 using CuteS.SyntaxAnalyser.AstNodes.StatementsNodes;
 
 namespace CuteS.SyntaxAnalyser.AstNodes
@@ -17,6 +18,26 @@ namespace CuteS.SyntaxAnalyser.AstNodes
             ClassName = className;
             Fields = fields;
             Functions = functions;
+        }
+
+        public override string Emit()
+        {
+            StringBuilder fields = new(), functions = new();
+
+            foreach (Declaration field in Fields) fields.Append("public ").Append(field.Emit()).Append('\n');
+            foreach (Function function in Functions) functions.Append("public ").Append(function.Emit()).Append('\n');
+
+            return $"public class {ClassName.Emit()}\n{{\n{fields}\n{functions}}}";
+        }
+
+        public override string ToString()
+        {
+            StringBuilder fields = new(), functions = new();
+
+            foreach (Declaration field in Fields) fields.Append(field.ToString());
+            foreach (Function function in Functions) functions.Append(function.ToString());
+
+            return $"Class(ClassName({ClassName});Fields({fields});Functions({functions}););";
         }
     }
 }

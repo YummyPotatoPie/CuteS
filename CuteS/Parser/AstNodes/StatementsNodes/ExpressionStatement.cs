@@ -7,5 +7,9 @@ namespace CuteS.SyntaxAnalyser.AstNodes.StatementsNodes
         public Expression ExpressionStmt { get; private set; }
 
         public ExpressionStatement(Expression expression, int line) : base(line) => ExpressionStmt = expression;
+
+        public override string Emit() => $"{ExpressionStmt.Emit()};";
+
+        public override string ToString() => $"ExpressionStatement({ExpressionStmt});";
     }
 }
