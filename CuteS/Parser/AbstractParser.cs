@@ -1,23 +1,21 @@
 using CuteS.LexicalAnalyser;
 
-using CuteS.Parser.AstNodes;
-
-namespace CuteS.Parser
+namespace CuteS.SyntaxAnalyser
 {
-    public abstract class AbstractParser<T> where T : Node
+    public abstract class AbstractParser<T> 
     {
         protected Lexer Lex;
 
-        public AbstractParser(ref Lexer lexer) => Lex = lexer;
-
-        protected void Match(int tokenTag)
-        {
-            if (Lex.CurrentToken == null) throw new SyntaxError();
-
-            if (tokenTag == Lex.CurrentToken.Tag) Lex.NextToken();
-            else throw new SyntaxError();
-        }
+        public AbstractParser(ref Lexer lex) => Lex = lex;
 
         public abstract T Parse();
+
+        public void Match(int tag)
+        {
+            if (Lex.CurrentToken == null) throw new SyntaxError("Unexpected end of file", Lex.Line);
+
+            if (Lex.CurrentToken.Tag == tag) Lex.NextToken();
+            else throw new SyntaxError($"Unexpected token {Lex.CurrentToken}", Lex.Line);
+        }
     }
 }
