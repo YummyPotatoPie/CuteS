@@ -1,10 +1,9 @@
 using System;
 
-namespace CuteS.Parser
+namespace CuteS.SyntaxAnalyser
 {
-    // Empty... for now
     public class SyntaxError : Exception
     {
-        
+        public SyntaxError(string message, int line) : base($"Syntax error at line {line}: {message}") { }
     }
 }
